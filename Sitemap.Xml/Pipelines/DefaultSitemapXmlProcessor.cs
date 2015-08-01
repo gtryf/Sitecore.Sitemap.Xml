@@ -2,13 +2,8 @@
 using Sitecore.ContentSearch.Linq.Utilities;
 using Sitecore.ContentSearch.SearchTypes;
 using Sitecore.Sites;
-using Sitecore.Xml;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace LD.Sitemap.Xml.Pipelines
 {
@@ -21,53 +16,8 @@ namespace LD.Sitemap.Xml.Pipelines
             this.indexName = indexName;
         }
 
-        private Dictionary<string, SiteDefinition> Configuration { get; set; }
-
-        private void ParseConfig()
-        {
-            Configuration = new Dictionary<string, SiteDefinition>();
-            foreach (XmlNode node in Sitecore.Configuration.Factory.GetConfigNodes("sitemap/site"))
-            {
-                var def = new SiteDefinition
-                {
-                    IncludedBaseTemplates = new List<string>(),
-                    IncludedTemplates = new List<string>(),
-                    ExcludedItems = new List<string>(),
-                };
-
-                var baseTemplates = XmlUtil.FindChildNode("includeBaseTemplates", node, false);
-                var includeTemplates = XmlUtil.FindChildNode("includeTemplates", node, false);
-                var excludeItems = XmlUtil.FindChildNode("excludeItems", node, false);
-                if (baseTemplates != null)
-                {
-                    foreach (XmlNode tmpl in baseTemplates.ChildNodes)
-                        def.IncludedBaseTemplates.Add(tmpl.InnerText);
-                }
-                if (includeTemplates != null)
-                {
-                    foreach (XmlNode tmpl in includeTemplates.ChildNodes)
-                        def.IncludedTemplates.Add(tmpl.InnerText);
-                }
-                if (excludeItems != null)
-                {
-                    foreach (XmlNode tmpl in excludeItems.ChildNodes)
-                        def.ExcludedItems.Add(tmpl.InnerText);
-                }
-
-                Configuration.Add(XmlUtil.GetAttribute("name", node), def);
-            }
-        }
-
-        private bool ImplementsTemplate(Sitecore.Data.Items.Item item, Sitecore.Data.ID templateID)
-        {
-            var itemTemplate = Sitecore.Data.Managers.TemplateManager.GetTemplate(item);
-            return itemTemplate.InheritsFrom(templateID);
-        }
-
         public override void Process(CreateSitemapXmlArgs args)
         {
-            ParseConfig();
-
             var langs = Sitecore.Data.Managers.LanguageManager.GetLanguages(Sitecore.Context.Database);
             var homeItem = Sitecore.Context.Database.GetItem(args.Site.RootPath + args.Site.StartItem);
 
