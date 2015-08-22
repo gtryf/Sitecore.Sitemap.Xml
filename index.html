@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Sitecore.Sitemap.xml by gtryf</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Sitecore.Sitemap.xml</h1>
+      <h2 class="project-tagline">Sitecore module to automatically generate sitemap.xml files based on CMS content</h2>
+      <a href="https://github.com/gtryf/Sitecore.Sitemap.Xml" class="btn">View on GitHub</a>
+      <a href="https://github.com/gtryf/Sitecore.Sitemap.Xml/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/gtryf/Sitecore.Sitemap.Xml/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="sitecoresitemapxml" class="anchor" href="#sitecoresitemapxml" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sitecore.Sitemap.Xml</h1>
+
+<p>Sitecore module to automatically generate sitemap.xml files based on CMS content. Tried and tested on Sitecore CMS
+7.0, 7.2, 7.5 and Sitecore XP8.</p>
+
+<h1>
+<a id="installation-from-source" class="anchor" href="#installation-from-source" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation from source</h1>
+
+<p>5 easy steps:</p>
+
+<ul>
+<li>Download source;</li>
+<li>Copy in the project's /lib directory the Sitecore assemblies mentioned in the readme file;</li>
+<li>Add the Sitemap.Xml project as an existing project in your solution;</li>
+<li>Reference the project in your main Sitecore solution;</li>
+<li>Edit your <code>web.config</code> to include the Sitemap.Xml IIS handler (see following section).</li>
+</ul>
+
+<h1>
+<a id="changes-in-webconfig" class="anchor" href="#changes-in-webconfig" aria-hidden="true"><span class="octicon octicon-link"></span></a>Changes in web.config</h1>
+
+<p>You need to add the Sitemap.Xml IIS handler in your <code>web.config</code> file. This needs to be done in two sections.</p>
+
+<h2>
+<a id="systemwebserver" class="anchor" href="#systemwebserver" aria-hidden="true"><span class="octicon octicon-link"></span></a>system.webServer</h2>
+
+<p>In <code>system.webServer/handlers</code>, add the following handler at the end:</p>
+
+<div class="highlight highlight-xml"><pre><span class="pl-c">&lt;!-- sitemap.xml: START --&gt;</span>
+&lt;<span class="pl-ent">add</span> <span class="pl-e">verb</span>=<span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span> <span class="pl-e">path</span>=<span class="pl-s"><span class="pl-pds">"</span>sitemap.xml<span class="pl-pds">"</span></span> 
+  <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>LD.Sitemap.Xml.SitemapHandler, Sitemap.Xml<span class="pl-pds">"</span></span> 
+  <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>LD.Sitemap.Xml<span class="pl-pds">"</span></span>/&gt;
+<span class="pl-c">&lt;!-- sitemap.xml: END --&gt;</span></pre></div>
+
+<h2>
+<a id="systemweb" class="anchor" href="#systemweb" aria-hidden="true"><span class="octicon octicon-link"></span></a>system.web</h2>
+
+<p>In <code>system.web/httpHandlers</code>, add the following handler at the end:</p>
+
+<div class="highlight highlight-xml"><pre><span class="pl-c">&lt;!-- sitemap.xml: START --&gt;</span>
+&lt;<span class="pl-ent">add</span> <span class="pl-e">verb</span>=<span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span> <span class="pl-e">path</span>=<span class="pl-s"><span class="pl-pds">"</span>sitemap.xml<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>LD.Sitemap.Xml.SitemapHandler, Sitemap.Xml<span class="pl-pds">"</span></span>/&gt;
+<span class="pl-c">&lt;!-- sitemap.xml: END --&gt;</span></pre></div>
+
+<h1>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuration</h1>
+
+<p>The project includes a file called <code>Sitemap.Xml.config</code> in its App_Config/Include folder. If you reference this
+project in your main Sitecore solution project, then this file should be copied to your project's App_Config/Include
+directory. You can use this skeleton configuration to configure the module.</p>
+
+<p>The configuration file allows for multiple managed websites. Its main node, <code>&lt;sitemap&gt;</code>, allows for one or more <code>&lt;site&gt;</code>
+elements, each one with a <code>name</code> required attribute, which must match the name of one of your Sitecore managed
+websites, and a combination of the elements described next. The handler indexes content under and including the
+item specified as start item for the corresponding managed website.</p>
+
+<h4>
+<a id="siteincludetemplates" class="anchor" href="#siteincludetemplates" aria-hidden="true"><span class="octicon octicon-link"></span></a>site/includeTemplates</h4>
+
+<p>A list of <em>template</em> IDs. The handler's output includes managed website items whose template ID matches exactly
+one of the IDs specified in this list. Example:</p>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">site</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>demo<span class="pl-pds">"</span></span>&gt;
+  &lt;<span class="pl-ent">includeTemplates</span>&gt;
+    &lt;<span class="pl-ent">template</span>&gt;{1C637B7D-FFBE-472B-A905-D48BB3B0BC26}&lt;/<span class="pl-ent">template</span>&gt;
+    &lt;<span class="pl-ent">template</span>&gt;{E1D0BDDE-18CF-4063-A9A1-8A6C40095BFA}&lt;/<span class="pl-ent">template</span>&gt;
+  &lt;/<span class="pl-ent">includeTemplates</span>&gt;
+&lt;/<span class="pl-ent">site</span>&gt;</pre></div>
+
+<h4>
+<a id="siteincludebasetemplates" class="anchor" href="#siteincludebasetemplates" aria-hidden="true"><span class="octicon octicon-link"></span></a>site/includeBaseTemplates</h4>
+
+<p>A list of <em>template</em> IDs. The handler's output includes managed website items whose template ID, or one of their base
+template IDs, matches exactly one of the IDs specified in this list. Example:</p>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">site</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>demo&gt;</span>
+<span class="pl-s">  &lt;includeBaseTemplates&gt;</span>
+<span class="pl-s">    &lt;template&gt;{7F91172F-22AB-404E-AF61-AD64E0BA1DF4}&lt;/template&gt;</span>
+<span class="pl-s">  &lt;/includeBaseTemplates&gt;</span>
+<span class="pl-s">&lt;/site&gt;</span></pre></div>
+
+<p><strong>Caveat: you should make sure that your ContentSearch index indexes all item templates. See the section on default
+behavior and extensibility, below.</strong></p>
+
+<h4>
+<a id="siteexcludeitems" class="anchor" href="#siteexcludeitems" aria-hidden="true"><span class="octicon octicon-link"></span></a>site/excludeItems</h4>
+
+<p>A list of <em>item</em> IDs. The handler's output excludes managed website items whose item IDs match exactly one of
+the IDs specified in this list, even if their template IDs match one of the IDs in the previous configuration
+nodes. Example:</p>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">site</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>demo<span class="pl-pds">"</span></span>&gt;
+  &lt;<span class="pl-ent">excludeItems</span>&gt;
+    &lt;<span class="pl-ent">item</span>&gt;{0790EAB8-466F-46CA-B29C-49D10505AC2E}&lt;/<span class="pl-ent">item</span>&gt;
+  &lt;/<span class="pl-ent">excludeItems</span>&gt;
+&lt;/<span class="pl-ent">site</span>&gt;</pre></div>
+
+<h1>
+<a id="default-behavior-and-extensibility" class="anchor" href="#default-behavior-and-extensibility" aria-hidden="true"><span class="octicon octicon-link"></span></a>Default behavior and extensibility</h1>
+
+<p>The handler produces its output by executing a pipeline, also defined in <code>Sitemap.Xml.config</code>,
+called <code>createSitemapXml</code>. The pipeline consisits of a single pipeline processor, which provides you with default
+behavior, i.e. it knows how to read and make sense of the configuration documented in the previous
+section. </p>
+
+<h2>
+<a id="default-behavior" class="anchor" href="#default-behavior" aria-hidden="true"><span class="octicon octicon-link"></span></a>Default behavior</h2>
+
+<p>To produce its output it uses ContentSearch to fetch the items that conform to the template/item
+restrictions you have configured. The pipeline processor is defined in <code>Sitemap.Xml.config</code> as follows:</p>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">pipelines</span>&gt;
+  &lt;<span class="pl-ent">createSitemapXml</span>&gt;
+    &lt;<span class="pl-ent">processor</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>LD.Sitemap.Xml.Pipelines.DefaultSitemapXmlProcessor, Sitemap.Xml<span class="pl-pds">"</span></span>&gt;
+      &lt;<span class="pl-ent">param</span> <span class="pl-e">desc</span>=<span class="pl-s"><span class="pl-pds">"</span>The index to use (leave empty to use default index)<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">param</span>&gt;
+    &lt;/<span class="pl-ent">processor</span>&gt;
+  &lt;/<span class="pl-ent">createSitemapXml</span>&gt;
+&lt;/<span class="pl-ent">pipelines</span>&gt;</pre></div>
+
+<p>The parameter to the pipeline processor specifies the ContentSearch index to use. If you leave it blank (as in
+the example configuration), it will default to the index resolved by the <code>contentSearch.getContextIndex</code>
+pipeline for the managed website's start item. <em>In any case, should you choose to index items by using restrictions
+on their base template, you should configure your ContentSearch indexes such that they include all templates
+(in the <code>_temaplates</code> index field)</em>, i.e.:</p>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">fields</span> <span class="pl-e">hint</span>=<span class="pl-s"><span class="pl-pds">"</span>raw:AddComputedIndexField<span class="pl-pds">"</span></span>&gt;
+  <span class="pl-c">&lt;!-- other computed index fields here... --&gt;</span>
+  &lt;<span class="pl-ent">field</span> <span class="pl-e">fieldName</span>=<span class="pl-s"><span class="pl-pds">"</span>_templates<span class="pl-pds">"</span></span> <span class="pl-e">storageType</span>=<span class="pl-s"><span class="pl-pds">"</span>yes<span class="pl-pds">"</span></span> <span class="pl-e">indexType</span>=<span class="pl-s"><span class="pl-pds">"</span>untokenized<span class="pl-pds">"</span></span>&gt;
+    Sitecore.ContentSearch.ComputedFields.AllTemplates, Sitecore.ContentSearch
+  &lt;/<span class="pl-ent">field</span>&gt;
+&lt;/<span class="pl-ent">fields</span>&gt;</pre></div>
+
+<h2>
+<a id="extending-the-pipeline" class="anchor" href="#extending-the-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extending the pipeline</h2>
+
+<p>You may choose to customize the pipeline by adding to it one or more pipeline processors that you write, or
+indeed replace the default processor entirely. This could be because you do not wish to use ContentSearch, or
+because you may want to index items from sources other than the Sitecore content tree. If you choose to write
+your own pipeline processor, it should inherit from <code>LD.Sitemap.Xml.Pipelines.CreateSitemapXmlProcessor</code>
+(in the <code>Sitemap.Xml</code> assembly) and override the <code>Process(CreateSitemapXmlArgs)</code> method. Once you inherit this
+class, you will have the <code>Configuration</code> property available to you, which is a <code>Dictionary&lt;string, SiteDefinition&gt;</code>
+containing the configuration for each managed template (i.e. three properties: <code>IncludedTemplates</code>;
+<code>IncludedBaseTemplates</code>; and <code>ExcludedItems</code>, which are all <code>List&lt;string&gt;</code> containing the configured IDs).</p>
+
+<p>In your <code>Process()</code> method, you are required to add to the <code>args.Nodes</code> list, which is a list of <code>UrlDefinition</code>.
+<code>UrlDefinition</code>s consist of a <code>string</code> that corresponds to a URL, and a <code>DateTime</code> corresponding to the last
+modified date/time. The elements you add to this list are added to the final sitemap.xml output.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/gtryf/Sitecore.Sitemap.Xml">Sitecore.Sitemap.xml</a> is maintained by <a href="https://github.com/gtryf">gtryf</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-66630127-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
