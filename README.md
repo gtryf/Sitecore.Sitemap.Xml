@@ -14,7 +14,7 @@ Sitecore module to automatically generate sitemap.xml files based on CMS content
 You need to add the Sitemap.Xml IIS handler in your `web.config` file. This needs to be done in two sections.
 ## system.webServer
 In `system.webServer/handlers`, add the following handler at the end:
-```
+```xml
 <!-- sitemap.xml: START -->
 <add verb="GET" path="sitemap.xml" 
   type="LD.Sitemap.Xml.SitemapHandler, Sitemap.Xml" 
@@ -23,7 +23,7 @@ In `system.webServer/handlers`, add the following handler at the end:
 ```
 ## system.web
 In `system.web/httpHandlers`, add the following handler at the end:
-```
+```xml
 <!-- sitemap.xml: START -->
 <add verb="GET" path="sitemap.xml" type="LD.Sitemap.Xml.SitemapHandler, Sitemap.Xml"/>
 <!-- sitemap.xml: END -->
@@ -36,14 +36,15 @@ directory. You can use this skeleton configuration to configure the module.
 
 The configuration file allows for multiple managed websites. Its main node, `<sitemap>`, allows for one or more `<site>`
 elements, each one with a `name` required attribute, which must match the name of one of your Sitecore managed
-websites, and a combination of the elements described next. The handler indexes content under and including the
+websites, an `embedLanguage` optional attribute (see the section on default behavior for more information),
+and a combination of the elements described next. The handler indexes content under and including the
 item specified as start item for the corresponding managed website.
 
 #### `site/includeTemplates`
 A list of *template* IDs. The handler's output includes managed website items whose template ID matches exactly
 one of the IDs specified in this list. Example:
 
-```
+```xml
 <site name="demo">
   <includeTemplates>
     <template>{1C637B7D-FFBE-472B-A905-D48BB3B0BC26}</template>
@@ -56,8 +57,8 @@ one of the IDs specified in this list. Example:
 A list of *template* IDs. The handler's output includes managed website items whose template ID, or one of their base
 template IDs, matches exactly one of the IDs specified in this list. Example:
 
-```
-<site name="demo>
+```xml
+<site name="demo">
   <includeBaseTemplates>
     <template>{7F91172F-22AB-404E-AF61-AD64E0BA1DF4}</template>
   </includeBaseTemplates>
@@ -71,7 +72,7 @@ A list of *item* IDs. The handler's output excludes managed website items whose 
 the IDs specified in this list, even if their template IDs match one of the IDs in the previous configuration
 nodes. Example:
 
-```
+```xml
 <site name="demo">
   <excludeItems>
     <item>{0790EAB8-466F-46CA-B29C-49D10505AC2E}</item>
@@ -89,7 +90,7 @@ section.
 To produce its output it uses ContentSearch to fetch the items that conform to the template/item
 restrictions you have configured. The pipeline processor is defined in `Sitemap.Xml.config` as follows:
 
-```
+```xml
 <pipelines>
   <createSitemapXml>
     <processor type="LD.Sitemap.Xml.Pipelines.DefaultSitemapXmlProcessor, Sitemap.Xml">
@@ -104,13 +105,31 @@ pipeline for the managed website's start item. *In any case, should you choose t
 on their base template, you should configure your ContentSearch indexes such that they include all templates
 (in the `_temaplates` index field)*, i.e.:
 
-```
+```xml
 <fields hint="raw:AddComputedIndexField">
   <!-- other computed index fields here... -->
   <field fieldName="_templates" storageType="yes" indexType="untokenized">
     Sitecore.ContentSearch.ComputedFields.AllTemplates, Sitecore.ContentSearch
   </field>
 </fields>
+```
+
+Each `/configuration/sitecore/site` element may have an optional `embedLanguage` boolean attribute. If this attribute
+is `true` (which is the default value), then the processor runs for all installed languages, and produces sitemap nodes
+which always have the language embedded, e.g. for the same page on a UK/French website:
+```xml
+<loc>http://<domain>.com/en-gb/page1</loc>
+<loc>http://<domain>.com/fr-fr/page1</loc>
+```
+If, however, you set this attribute to `false`, then your website must use its domain to distinguish the language and
+never embeds it into the sitemap nodes, so if for the above website you request `http://<domain>.co.uk/sitemap.xml`
+you will get:
+```xml
+<loc>http://<domain>.co.uk/page1</loc>
+```
+while `http://<domain>.fr/sitemap.xml` should give you:
+```xml
+<loc>http://<domain>.fr/page1</loc>
 ```
 
 ## Extending the pipeline
