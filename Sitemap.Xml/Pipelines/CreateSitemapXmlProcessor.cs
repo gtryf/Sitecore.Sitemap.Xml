@@ -22,8 +22,19 @@ namespace LD.Sitemap.Xml.Pipelines
                             IncludedBaseTemplates = new List<string>(),
                             IncludedTemplates = new List<string>(),
                             ExcludedItems = new List<string>(),
-                        };
 
+                            EmbedLanguage = true,
+                            SiteName = XmlUtil.GetAttribute("name", node),
+                        };
+                        var embed = XmlUtil.GetAttribute("embedLanguage", node);
+                        if (!string.IsNullOrEmpty(embed))
+                        {
+                            bool embedVal;
+                            if (!bool.TryParse(embed, out embedVal))
+                                embedVal = true;
+                            def.EmbedLanguage = embedVal;
+                        }
+                        
                         var baseTemplates = XmlUtil.FindChildNode("includeBaseTemplates", node, false);
                         var includeTemplates = XmlUtil.FindChildNode("includeTemplates", node, false);
                         var excludeItems = XmlUtil.FindChildNode("excludeItems", node, false);
