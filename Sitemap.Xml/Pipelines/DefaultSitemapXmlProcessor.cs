@@ -41,6 +41,7 @@ namespace LD.Sitemap.Xml.Pipelines
 
                 var items = results
                     .Select(i => Sitecore.Configuration.Factory.GetDatabase(i.DatabaseName).GetItem(i.ItemId, Sitecore.Globalization.Language.Parse(i.Language), Sitecore.Data.Version.Latest))
+                    .Where(i => i != null) // exclude results that exist in the index but not in the database
                     .ToList();
 
                 var sb = new StringBuilder();
