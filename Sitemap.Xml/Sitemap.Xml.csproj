@@ -64,6 +64,7 @@
     <Compile Include="Pipelines\InitializeRemoteEvents.cs" />
     <Compile Include="Pipelines\UrlDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RobotsHandler.cs" />
     <Compile Include="SiteDefinition.cs" />
     <Compile Include="SitemapBuilder.cs" />
     <Compile Include="SitemapHandler.cs" />
