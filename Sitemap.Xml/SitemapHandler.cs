@@ -1,11 +1,9 @@
 ﻿using System;
-using LD.Sitemap.Xml.Pipelines;
-using Sitecore.Pipelines;
 using Sitecore.Xml;
 using System.Linq;
-using System.Text;
 using System.Web;
 using System.Xml;
+using System.IO;
 
 namespace LD.Sitemap.Xml
 {
@@ -36,23 +34,23 @@ namespace LD.Sitemap.Xml
                 return;
             }
 
-            Sitecore.Context.SetActiveSite(website.Name);
-
-            context.Response.ContentType = "text/xml";
-            context.Response.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
-            var args = new CreateSitemapXmlArgs(website);
-            CorePipeline.Run("createSitemapXml", args);
-            var sb = new StringBuilder();
-            foreach (var node in args.Nodes)
+            var folder = Sitecore.IO.FileUtil.MapPath($"{Sitecore.Configuration.Settings.GetSetting("Sitemap.Xml.TempDirectory").TrimEnd('/')}/{website.Name}");
+            if (context.Request.Path == "/sitemap.xml" && !File.Exists($"{folder}\\sitemap.xml") && File.Exists($"{folder}\\sitemap_index.xml"))
+                context.Response.Redirect("/sitemap_index.xml");
+            else
             {
-                sb.Append("<url>")
-                    .AppendFormat("<loc>{0}</loc>", node.Location)
-                    .AppendFormat("<lastmod>{0}</lastmod>", node.LastModified.ToString("yyyy-MM-dd"))
-                    .Append("</url>");
-                context.Response.Write(sb.ToString());
-                sb.Clear();
+                var path = $"{folder}\\{context.Request.Path.TrimStart('/')}";
+                if (!File.Exists(path))
+                {
+                    context.Response.StatusCode = 404;
+                    return;
+                }
+                else
+                {
+                    context.Response.ContentType = "application/xml";
+                    context.Response.Write(File.ReadAllText(path));
+                }
             }
-            context.Response.Write("</urlset>");
         }
     }
 }
