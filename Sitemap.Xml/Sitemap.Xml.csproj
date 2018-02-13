@@ -56,12 +56,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\BuildSitemapRemoteEvent.cs" />
     <Compile Include="Pipelines\CreateSitemapXmlArgs.cs" />
     <Compile Include="Pipelines\CreateSitemapXmlProcessor.cs" />
     <Compile Include="Pipelines\DefaultSitemapXmlProcessor.cs" />
+    <Compile Include="Pipelines\InitializeRemoteEvents.cs" />
     <Compile Include="Pipelines\UrlDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SiteDefinition.cs" />
+    <Compile Include="SitemapBuilder.cs" />
     <Compile Include="SitemapHandler.cs" />
   </ItemGroup>
   <ItemGroup>
