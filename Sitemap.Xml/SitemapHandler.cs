@@ -1,4 +1,5 @@
-﻿using LD.Sitemap.Xml.Pipelines;
+﻿using System;
+using LD.Sitemap.Xml.Pipelines;
 using Sitecore.Pipelines;
 using Sitecore.Xml;
 using System.Linq;
@@ -19,7 +20,10 @@ namespace LD.Sitemap.Xml
                 .Select(node => XmlUtil.GetAttribute("name", node));
 
             var website = Sitecore.Configuration.Factory.GetSiteInfoList()
-                .FirstOrDefault(i => i.HostName.ToLower() == context.Request.Url.Host.ToLower());
+                .FirstOrDefault(i => i.HostName != null &&
+                    i.HostName.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Any(n => string.Equals(n, context.Request.Url.Host, StringComparison.CurrentCultureIgnoreCase)));
+
             if (website == null || (website.Port > 0 && website.Port != context.Request.Url.Port))
             {
                 context.Response.StatusCode = 404;
